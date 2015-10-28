@@ -64,7 +64,7 @@ void loop() {
       // Only send command if state is HIGH
       if (buttonState == HIGH) {
         Serial.println(buttonState);
-        sendCommand();
+        ringBell();
       }
     }
   }
@@ -73,18 +73,18 @@ void loop() {
   lastButtonState = reading;
 }
 
-void sendCommand() {
+void ringBell() {
 
   // Use WiFiClient class to create TCP connections
   WiFiClient client;
-  const int httpPort = 80;
+  const int httpPort = 3000;
   if (!client.connect(host, httpPort)) {
     Serial.println("connection failed");
     return;
   }
 
   // We now create a URI for the request
-  String url = "/id";
+  String url = "/doorbell";
   
   Serial.print("Requesting URL: ");
   Serial.println(url);
@@ -93,7 +93,40 @@ void sendCommand() {
   client.print(String("GET ") + url + " HTTP/1.1\r\n" +
                "Host: " + host + "\r\n" + 
                "Connection: close\r\n\r\n");
-  delay(10);
+  delay(100);
+  
+  // Read all the lines of the reply from server and print them to Serial
+  while(client.available()){
+    String line = client.readStringUntil('\r');
+    Serial.print(line);
+  }
+  
+  Serial.println();
+  Serial.println("closing connection");
+  
+}
+
+void sendCommand(int state) {
+
+  // Use WiFiClient class to create TCP connections
+  WiFiClient client;
+  const int httpPort = 3000;
+  if (!client.connect(host, httpPort)) {
+    Serial.println("connection failed");
+    return;
+  }
+
+  // We now create a URI for the request
+  String url = "/digital/7/" + String(state);
+  
+  Serial.print("Requesting URL: ");
+  Serial.println(url);
+  
+  // This will send the request to the server
+  client.print(String("GET ") + url + " HTTP/1.1\r\n" +
+               "Host: " + host + "\r\n" + 
+               "Connection: close\r\n\r\n");
+  delay(100);
   
   // Read all the lines of the reply from server and print them to Serial
   while(client.available()){
