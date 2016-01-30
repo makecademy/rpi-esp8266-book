@@ -2,17 +2,17 @@
 #include <ESP8266WiFi.h>
 
 // WiFi parameters
-const char* ssid     = "Flat15";
-const char* password = "marcowifi15";
+const char* ssid     = "your-wifi-name";
+const char* password = "your-wifi-address";
 
 // Host
-const char* host = "192.168.0.104";
+const char* host = "raspberry-pi-ip-address";
 
 // Button pin
 const int buttonPin = 5;
 
 // Variables
-int buttonState;             
+int buttonState;
 int lastButtonState = LOW;
 
 // Debounce time constants
@@ -30,19 +30,19 @@ void setup() {
   Serial.println();
   Serial.print("Connecting to ");
   Serial.println(ssid);
-  
+
   WiFi.begin(ssid, password);
-  
+
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
 
   Serial.println("");
-  Serial.println("WiFi connected");  
+  Serial.println("WiFi connected");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
-  
+
 }
 
 void loop() {
@@ -56,7 +56,7 @@ void loop() {
   }
 
   if ((millis() - lastDebounceTime) > debounceDelay) {
-    
+
     // If the button state has changed:
     if (reading != buttonState) {
       buttonState = reading;
@@ -85,25 +85,25 @@ void ringBell() {
 
   // We now create a URI for the request
   String url = "/doorbell";
-  
+
   Serial.print("Requesting URL: ");
   Serial.println(url);
-  
+
   // This will send the request to the server
   client.print(String("GET ") + url + " HTTP/1.1\r\n" +
-               "Host: " + host + "\r\n" + 
+               "Host: " + host + "\r\n" +
                "Connection: close\r\n\r\n");
-  delay(100);
-  
+  delay(500);
+
   // Read all the lines of the reply from server and print them to Serial
   while(client.available()){
     String line = client.readStringUntil('\r');
     Serial.print(line);
   }
-  
+
   Serial.println();
   Serial.println("closing connection");
-  
+
 }
 
 void sendCommand(int state) {
@@ -118,24 +118,23 @@ void sendCommand(int state) {
 
   // We now create a URI for the request
   String url = "/digital/7/" + String(state);
-  
+
   Serial.print("Requesting URL: ");
   Serial.println(url);
-  
+
   // This will send the request to the server
   client.print(String("GET ") + url + " HTTP/1.1\r\n" +
-               "Host: " + host + "\r\n" + 
+               "Host: " + host + "\r\n" +
                "Connection: close\r\n\r\n");
   delay(100);
-  
+
   // Read all the lines of the reply from server and print them to Serial
   while(client.available()){
     String line = client.readStringUntil('\r');
     Serial.print(line);
   }
-  
+
   Serial.println();
   Serial.println("closing connection");
-  
-}
 
+}

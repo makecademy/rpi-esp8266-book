@@ -1,4 +1,5 @@
 // Start
+var Sound = require('node-aplay');
 var express = require('express');
 var app = express();
 
@@ -9,7 +10,6 @@ app.get('/doorbell', function(req, res) {
 });
 
 var piREST = require('pi-arest')(app);
-var Sound = require('node-aplay');
 
 // Set parameters
 piREST.set_id('34f5eQ');
